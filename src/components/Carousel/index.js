@@ -14,7 +14,7 @@ function Carousel({
   return (
     <VideoCardGroupContainer>
       {categoryTitle && (
-        <>
+        <React.Fragment>
           <Title style={{ backgroundColor: categoryColor || 'red' }}>
             {categoryTitle}
           </Title>
@@ -23,7 +23,7 @@ function Carousel({
               {categoryExtraLink.text}  
             </ExtraLink>
           }
-        </>
+        </React.Fragment>
       )}
       <Slider>
         {videos.map((video, index) => {
