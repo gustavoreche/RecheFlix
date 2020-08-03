@@ -4,12 +4,13 @@ import PageDefault from '../../../components/PageDefault';
 import FormField from '../../../components/FormField';
 import Button from '../../../components/Button';
 import useForm from '../../../hooks/useForm';
+import categoriasRepository from '../../../repositories/categorias';
 
 function CadastroCategoria() {
   const [categorias, setCategorias] = useState([]);
 
   const valoresIniciais = {
-    nome: '',
+    titulo: '',
     descricao: '',
     cor: '#000',
   };
@@ -17,26 +18,30 @@ function CadastroCategoria() {
   const { handleChange, values, clearForm } = useForm(valoresIniciais);
 
   useEffect(() => {
-    const URL = window.location.hostname.includes('localhost')
-      ? 'https://localhost:8080/categorias'
-      : 'https://recheflix.herokuapp.com/categorias';
-    fetch(URL).then(async (respostaDoServidor) => {
-      const resposta = await respostaDoServidor.json();
-      setCategorias([
-        ...resposta,
-      ]);
-    });
+    categoriasRepository.getAll()
+      .then((categoriasFromServer) => {
+        setCategorias(categoriasFromServer);
+      });
   }, []);
 
   return (
     <PageDefault>
       <h1>
         Cadastro de Categoria:
-        {values.nome}
+        {values.titulo}
       </h1>
 
-      <form onSubmit={function handleSubmit(infoDoEvento) {
-        infoDoEvento.preventDefault();
+      <form onSubmit={(event) => {
+        event.preventDefault();
+
+        categoriasRepository.createCategorie({
+          titulo: values.titulo,
+          cor: values.cor,
+          link_extra: {
+            text: values.descricao,
+            url: values.url,
+          },
+        });
 
         setCategorias([
           ...categorias,
@@ -49,8 +54,8 @@ function CadastroCategoria() {
 
         <FormField
           label="Nome da Categoria"
-          name="nome"
-          value={values.nome}
+          name="titulo"
+          value={values.titulo}
           onChange={handleChange}
         />
 
@@ -59,6 +64,13 @@ function CadastroCategoria() {
           type="textarea"
           name="descricao"
           value={values.descricao}
+          onChange={handleChange}
+        />
+
+        <FormField
+          label="Url de explicação"
+          name="url"
+          value={values.url}
           onChange={handleChange}
         />
 
